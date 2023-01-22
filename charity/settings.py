@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'accounts.apps.AccountsConfig',
     'charities.apps.CharitiesConfig',
+    'about_us.apps.AboutUsConfig',
 ]
 
 MIDDLEWARE = [
