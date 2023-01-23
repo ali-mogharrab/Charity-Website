@@ -1,5 +1,7 @@
 from django.db import models
 from accounts.models import User
+from django.db.models import Q
+
 
 class Benefactor(models.Model):
     EXP_CHOICES = (
@@ -11,10 +13,24 @@ class Benefactor(models.Model):
     experience = models.SmallIntegerField(choices=EXP_CHOICES, default=0)
     free_time_per_week = models.PositiveSmallIntegerField(default=0)
 
+
 class Charity(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     reg_number = models.CharField(max_length=10)
+
+
+class TaskManager(models.Manager):
+    def related_tasks_to_charity(self, user):
+        return Task.objects.filter(charity__user=user)
+
+    def related_tasks_to_benefactor(self, user):
+        return Task.objects.filter(assigned_benefactor__user=user)
+
+    def all_related_tasks_to_user(self, user):
+        conditions = Q(charity__user=user) | Q(assigned_benefactor__user=user) | Q(state='P')
+        return Task.objects.filter(conditions)
+
 
 class Task(models.Model):
     GENDER_CHOICES = (
@@ -36,3 +52,4 @@ class Task(models.Model):
     gender_limit = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     state = models.CharField(max_length=1, choices=STATE_CHOICES, default='P')
     title = models.CharField(max_length=60)
+    objects = TaskManager()
