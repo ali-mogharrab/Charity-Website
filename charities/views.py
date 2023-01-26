@@ -2,7 +2,7 @@ from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from charities.serializers import BenefactorSerializer
+from charities.serializers import CharitySerializer, BenefactorSerializer
 
 
 class BenefactorRegistration(APIView):
@@ -15,3 +15,15 @@ class BenefactorRegistration(APIView):
             return Response({'message': 'User was registered successfully!'})
         
         return Response({'message': benefactor.errors})
+
+
+class CharityRegistration(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        charity = CharitySerializer(data=request.data)
+        if charity.is_valid():
+            charity.save(user=request.user)
+            return Response({'message': 'User was registered successfully!'})
+
+        return Response({'message': charity.errors})
