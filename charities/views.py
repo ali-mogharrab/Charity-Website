@@ -118,3 +118,20 @@ class TaskResponse(APIView):
             task.assigned_benefactor = None
             task.save()
             return Response(data={'detail': 'Response sent.'}, status=200)
+
+
+class DoneTask(APIView):
+    parser_classes = (IsCharityOwner, )
+    
+    def post(self, request, task_id):
+        try:
+            task = get_object_or_404(Task, id=task_id)
+        except Task.DoesNotExist:
+            return task
+
+        if task.state != 'A':
+            return Response(data={'detail': 'Task is not assigned yet.'}, status=404)
+
+        task.state = 'D'
+        task.save()
+        return Response(data={'detail': 'Task has been done successfully.'}, status=200)
